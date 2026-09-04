@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="js/theme-init.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in — Smart Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+<div class="auth-shell">
+
+  <aside class="auth-hero">
+    <div class="auth-hero__sweep"></div>
+    <div class="auth-hero__content">
+      <a href="index.html" class="auth-hero__brand">
+        <span class="auth-hero__mark">SL</span>
+        <span class="auth-hero__brandtext">Smart Library</span>
+      </a>
+
+      <h1 class="auth-hero__title">Welcome back.</h1>
+      <p class="auth-hero__subtitle">Log in to check due dates, reserve a title, or pick up where you left off in the catalog.</p>
+
+      <dl class="auth-hero__stats">
+        <div>
+          <dt>1,250+</dt>
+          <dd>Titles in the catalog</dd>
+        </div>
+        <div>
+          <dt>420+</dt>
+          <dd>Members already registered</dd>
+        </div>
+        <div>
+          <dt>14</dt>
+          <dd>Day standard loan period</dd>
+        </div>
+      </dl>
+    </div>
+  </aside>
+
+  <main class="auth-form-side">
+    <div class="auth-card">
+      <div class="auth-card__head" id="login-view-head">
+        <h2>Log in</h2>
+        <p>New to Smart Library? <a href="signup.html">Sign up</a></p>
+      </div>
+
+      <form id="login-form" novalidate>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" autocomplete="email" required>
+          <span class="field-error" data-for="email"></span>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="password-input">
+            <input type="password" id="password" name="password" autocomplete="current-password" required>
+            <button type="button" class="password-toggle" id="password-toggle" aria-label="Show password">
+              <i class="ti ti-eye" aria-hidden="true"></i>
+            </button>
+          </div>
+          <span class="field-error" data-for="password"></span>
+        </div>
+
+        <div class="login-row">
+          <label class="checkbox">
+            <input type="checkbox" id="remember" name="remember" checked>
+            <span>Remember me</span>
+          </label>
+          <button type="button" class="link-btn" id="forgot-link">Forgot password?</button>
+        </div>
+
+        <div class="field-error field-error--form" id="form-error"></div>
+
+        <button type="submit" class="btn-gradient btn-block" id="submit-btn">
+          <span class="btn-label">Log in</span>
+          <span class="btn-spinner" hidden></span>
+        </button>
+      </form>
+
+      <!-- Forgot-password view (hidden by default) -->
+      <form id="reset-form" novalidate hidden>
+        <p class="reset-copy">Enter your account email and we'll send you a link to reset your password.</p>
+        <div class="field">
+          <label for="reset_email">Email</label>
+          <input type="email" id="reset_email" name="reset_email" autocomplete="email" required>
+          <span class="field-error" data-for="reset_email"></span>
+        </div>
+
+        <div class="field-error field-error--form" id="reset-form-error"></div>
+
+        <button type="submit" class="btn-gradient btn-block" id="reset-submit-btn">
+          <span class="btn-label">Send reset link</span>
+          <span class="btn-spinner" hidden></span>
+        </button>
+        <button type="button" class="link-btn link-btn--center" id="back-to-login">Back to log in</button>
+      </form>
+    </div>
+  </main>
+
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<script type="module" src="js/login.js"></script>
+</body>
+</html>

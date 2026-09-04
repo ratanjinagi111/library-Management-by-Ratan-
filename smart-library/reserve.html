@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reserve a book - Smart Library</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, Segoe UI, Arial, sans-serif; color: #14203d; background: #f1f5ff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: linear-gradient(135deg, #eefaff, #f1efff); }
+    header { padding: 22px 8%; color: #fff; background: linear-gradient(120deg, #0a1837, #5140d8); }
+    header h1 { margin: 0 0 6px; font-size: 24px; }
+    header p { margin: 0; color: #dce5ff; }
+    main { width: min(920px, calc(100% - 32px)); margin: 32px auto; }
+    .back { color: #416fe5; text-decoration: none; font-size: 14px; }
+    .card { margin-top: 18px; padding: 28px; background: #fff; border: 1px solid #e4e9f5; border-radius: 16px; box-shadow: 0 16px 40px #253a6b12; }
+    .book { display: grid; gap: 6px; margin-bottom: 24px; }
+    .book h2 { margin: 0; font-size: 28px; }
+    .muted { color: #71809d; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    label { display: grid; gap: 8px; color: #53617d; font-size: 13px; font-weight: 600; }
+    input { width: 100%; padding: 12px; border: 1px solid #d7deed; border-radius: 8px; font: inherit; color: inherit; }
+    .summary { display: flex; gap: 24px; margin: 24px 0; padding: 16px; background: #f5f7ff; border-radius: 10px; }
+    .summary b { display: block; margin-top: 4px; color: #17213e; }
+    button, .success a { display: inline-block; border: 0; border-radius: 9px; padding: 12px 20px; color: #fff; background: linear-gradient(120deg, #416fe5, #7136df); font: inherit; font-weight: 700; cursor: pointer; text-decoration: none; }
+    .error { display: none; margin-bottom: 14px; color: #c5364c; font-size: 13px; }
+    .success { display: none; text-align: center; padding: 26px 0 8px; }
+    .success h2 { margin: 0 0 12px; color: #168565; }
+    .success p { line-height: 1.8; }
+    @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } .summary { flex-wrap: wrap; gap: 14px; } .card { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <header><h1>Reserve a book</h1><p>Choose your rental period and confirm your reservation.</p></header>
+  <main>
+    <a class="back" href="book-details.html">&larr; Back to book details</a>
+    <section class="card" id="reservation-form">
+      <div class="book"><h2 id="book-title">Book</h2><div class="muted" id="book-author"></div></div>
+      <div class="form-grid">
+        <label>Purchase / issue date<input id="issue-date" type="date" required></label>
+        <label>Submission / return date<input id="return-date" type="date" required></label>
+      </div>
+      <div class="summary"><div>Rental period<b id="duration">-</b></div><div>Total amount<b id="amount">₹0</b></div></div>
+      <div class="error" id="error"></div>
+      <button id="confirm" type="button">Confirm reservation</button>
+    </section>
+    <section class="card success" id="success">
+      <h2>Reservation confirmed!</h2>
+      <p id="success-text"></p>
+      <a href="my-borrowings.html">View my borrowings</a>
+    </section>
+  </main>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const title = params.get('title') || 'Selected book';
+    const author = params.get('author') || 'Library collection';
+    const price = Number(params.get('price') || 19);
+    const titleEl = document.getElementById('book-title');
+    const authorEl = document.getElementById('book-author');
+    const issueInput = document.getElementById('issue-date');
+    const returnInput = document.getElementById('return-date');
+    const durationEl = document.getElementById('duration');
+    const amountEl = document.getElementById('amount');
+    const errorEl = document.getElementById('error');
+    const today = new Date();
+    const todayValue = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    titleEl.textContent = title;
+    authorEl.textContent = author;
+    issueInput.min = todayValue;
+    issueInput.value = todayValue;
+    returnInput.min = todayValue;
+
+    function updateSummary() {
+      if (!issueInput.value || !returnInput.value) return;
+      const days = Math.round((new Date(returnInput.value) - new Date(issueInput.value)) / 86400000);
+      durationEl.textContent = days > 0 ? `${days} day${days === 1 ? '' : 's'}` : 'Invalid';
+      amountEl.textContent = days > 0 ? `₹${days * price}` : '₹0';
+    }
+    issueInput.addEventListener('change', () => { returnInput.min = issueInput.value; updateSummary(); });
+    returnInput.addEventListener('change', updateSummary);
+    document.getElementById('confirm').addEventListener('click', () => {
+      const days = Math.round((new Date(returnInput.value) - new Date(issueInput.value)) / 86400000);
+      if (!issueInput.value || !returnInput.value || days < 1) {
+        errorEl.textContent = 'Submission date must be at least 1 day after the issue date.';
+        errorEl.style.display = 'block';
+        return;
+      }
+      const borrowings = JSON.parse(localStorage.getItem('sl-local-borrowings') || '[]');
+      borrowings.push({ id: params.get('id') || `local-${Date.now()}`, memberId: params.get('memberId'), title, author, issueDate: issueInput.value, dueDate: returnInput.value, status: 'issued' });
+      localStorage.setItem('sl-local-borrowings', JSON.stringify(borrowings));
+      document.getElementById('reservation-form').style.display = 'none';
+      document.getElementById('success').style.display = 'block';
+      document.getElementById('success-text').innerHTML = `<b>${title}</b> reserved successfully.<br>Return date: ${returnInput.value}<br>Total amount: <b>₹${days * price}</b>`;
+    });
+  </script>
+</body>
+</html>

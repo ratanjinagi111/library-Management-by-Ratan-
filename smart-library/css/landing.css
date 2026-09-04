@@ -1,0 +1,81 @@
+/* ============================================================
+   LANDING.CSS — public homepage
+   ============================================================ */
+
+.landing-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 40px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+}.landing-nav__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+}
+.landing-nav__brand:hover { text-decoration: none; }
+.landing-nav__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--royal-blue), var(--purple));
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+}
+.landing-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.landing-nav__links a:not(.btn-gradient) { color: var(--text-secondary); }
+.landing-nav__links a:not(.btn-gradient):hover { color: var(--text-primary); }
+
+.landing-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 96px 40px;
+  text-align: center;
+  background: linear-gradient(165deg, var(--navy) 0%, #1E3A8A 50%, var(--purple) 100%);
+  color: var(--text-on-dark);
+}
+.landing-hero__sweep {
+  position: absolute;
+  top: -30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 160%;
+  background: radial-gradient(circle, rgba(34,211,238,0.22) 0%, rgba(34,211,238,0) 65%);
+  pointer-events: none;
+}
+.landing-hero__content { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
+.landing-hero h1 { font-size: 46px; line-height: 1.15; }
+.landing-hero p { margin: 20px auto 0; font-size: 16px; color: var(--text-on-dark-muted); max-width: 480px; }
+.landing-hero__actions { display: flex; gap: 14px; justify-content: center; margin-top: 32px; }
+
+.landing-footer {
+  text-align: center;
+  padding: 28px;
+  color: var(--text-muted);
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 720px) {
+  .landing-nav { padding: 16px 20px; }
+  .landing-nav__links { gap: 14px; font-size: 13px; }
+  .landing-hero { padding: 64px 20px; }
+  .landing-hero h1 { font-size: 32px; }
+}
