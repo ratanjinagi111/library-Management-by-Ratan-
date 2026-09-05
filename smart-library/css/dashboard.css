@@ -58,14 +58,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
   border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, var(--cyan), var(--violet));
-  color: var(--navy);
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 13px;
 }
 .sidebar__brandtext {
   font-family: var(--font-display);

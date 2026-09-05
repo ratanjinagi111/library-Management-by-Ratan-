@@ -140,14 +140,10 @@ button { font-family: inherit; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
   border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, var(--cyan), var(--violet));
-  color: var(--navy);
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 14px;
 }
 
 .auth-hero__brandtext {

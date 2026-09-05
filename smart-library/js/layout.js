@@ -42,7 +42,7 @@ export async function initAppShell({ activeKey, title, subtitle }) {
     <div class="app-shell">
       <aside class="sidebar" id="sidebar">
         <a href="dashboard.html" class="sidebar__brand">
-          <span class="sidebar__mark">SL</span>
+          <img class="sidebar__mark" src="assets/logo.png" alt="">
           <span class="sidebar__brandtext">Smart Library</span>
         </a>
         <nav class="sidebar__nav">
