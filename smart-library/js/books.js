@@ -5,14 +5,13 @@
 
 import { initAppShell, escapeHtml } from './layout.js';
 import { supabase, showToast, logActivity } from './supabase-config.js';
+import { getBookImage } from './book-images.js';
 
 const { profile, isStaff, contentEl } = await initAppShell({
   activeKey: 'books',
   title: 'Books',
   subtitle: 'Browse the catalog and check availability',
 });
-
-const COVER_CLASSES = ['', 'c2', 'c3', 'c4'];
 
 contentEl.innerHTML = `
   <div class="toolbar">
@@ -126,7 +125,7 @@ function render() {
     return;
   }
 
-  grid.innerHTML = rows.map((b, i) => {
+  grid.innerHTML = rows.map((b) => {
     const total = (b.book_copies || []).length;
     const available = (b.book_copies || []).filter((c) => c.status === 'available').length;
     const statusBadge = available > 0
@@ -134,8 +133,10 @@ function render() {
       : `<span class="badge badge--overdue">Unavailable</span>`;
 
     return `
-      <a href="book-details.html?id=${b.id}" class="book-card">
-        <div class="book-card__cover ${COVER_CLASSES[i % 4]}"><i class="ti ti-book-2"></i></div>
+      <a href="book-details?id=${encodeURIComponent(b.id)}" class="book-card">
+        <div class="book-card__cover">
+          <img class="book-image" src="${getBookImage(b.title)}" alt="${escapeHtml(b.title)} book cover" onerror="this.onerror=null;this.src='assets/books/book-placeholder.svg';">
+        </div>
         <div class="book-card__body">
           <div class="book-card__title">${escapeHtml(b.title)}</div>
           <div class="book-card__meta">${escapeHtml(b.authors?.author_name || 'Unknown author')}</div>

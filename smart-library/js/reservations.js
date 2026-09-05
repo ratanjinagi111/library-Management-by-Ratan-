@@ -7,11 +7,12 @@
 
 import { initAppShell, escapeHtml } from './layout.js';
 import { supabase, showToast, logActivity } from './supabase-config.js';
+import { getBookImage } from './book-images.js';
 
 const { profile, isStaff, contentEl } = await initAppShell({
   activeKey: 'reservations',
   title: 'Reservations',
-  subtitle: isStaff ? 'All reservation requests' : 'Books you have reserved',
+  subtitle: 'Manage book reservations',
 });
 
 contentEl.innerHTML = `
@@ -32,18 +33,16 @@ contentEl.innerHTML = `
 
 let memberRow = null;
 if (!isStaff) {
-  const { data, error: memberError } = await supabase.from('members').select('id').eq('user_id', profile.id).single();
+  const { data: members, error: memberError } = await supabase.from('members').select('id').eq('user_id', profile.id).limit(1);
   if (memberError) console.error('reservations: failed to load member row', memberError);
-  memberRow = data;
+  memberRow = members?.[0] || null;
 }
-
-const STATUS_OPTIONS = ['pending', 'available', 'completed', 'cancelled', 'expired'];
 
 async function load() {
   try {
     let query = supabase
       .from('reservations')
-      .select('id, reservation_date, expiry_date, status, books(title), members(profiles(full_name))')
+      .select('id, reservation_date, expiry_date, status, books(title, isbn, authors(author_name), categories(category_name)), members(profiles(full_name))')
       .order('reservation_date', { ascending: false });
 
     if (!isStaff) {
@@ -70,28 +69,46 @@ async function load() {
 
     tbody.innerHTML = data.map((r) => `
       <tr>
-        <td>${escapeHtml(r.books?.title || '—')}</td>
+        <td>
+          <div class="reservation-book">
+            <img src="${getBookImage(r.books?.title)}" alt="${escapeHtml(r.books?.title || 'Book')} cover" onerror="this.onerror=null;this.src='assets/books/book-placeholder.svg';">
+            <div>
+              <strong>${escapeHtml(r.books?.title || '—')}</strong>
+              <span>${escapeHtml(r.books?.authors?.author_name || 'Unknown author')}</span>
+              <small>${escapeHtml(r.books?.categories?.category_name || '—')} · ISBN ${escapeHtml(r.books?.isbn || '—')}</small>
+            </div>
+          </div>
+        </td>
         ${isStaff ? `<td>${escapeHtml(r.members?.profiles?.full_name || '—')}</td>` : ''}
         <td>${r.reservation_date}</td>
         <td>${r.expiry_date || '—'}</td>
         <td>
           ${isStaff
-            ? `<select class="filter-select status-select" data-id="${r.id}">
-                ${STATUS_OPTIONS.map((s) => `<option value="${s}" ${s === r.status ? 'selected' : ''}>${s}</option>`).join('')}
-              </select>`
-            : `<span class="badge ${r.status === 'pending' ? 'badge--pending' : r.status === 'available' ? 'badge--available' : 'badge--overdue'}">${escapeHtml(r.status)}</span>`}
+            ? r.status === 'pending'
+              ? `<button class="btn-gradient btn-sm accept-btn" data-id="${r.id}" data-due-date="${r.expiry_date || ''}">Accept</button>`
+              : `<span class="badge ${r.status === 'accepted' ? 'badge--available' : 'badge--overdue'}">${escapeHtml(r.status)}</span>`
+            : `<span class="badge ${r.status === 'pending' ? 'badge--pending' : r.status === 'accepted' ? 'badge--available' : 'badge--overdue'}">${escapeHtml(r.status)}</span>`}
         </td>
         <td>
           ${(!isStaff && r.status === 'pending') ? `<button class="btn-outline-danger cancel-btn" data-id="${r.id}">Cancel</button>` : ''}
         </td>
       </tr>`).join('');
 
-    tbody.querySelectorAll('.status-select').forEach((sel) => {
-      sel.addEventListener('change', async () => {
-        const { error: updError } = await supabase.from('reservations').update({ status: sel.value }).eq('id', sel.dataset.id);
-        if (updError) { showToast('Unable to update reservation.', 'error'); return; }
-        await logActivity(profile.id, 'Updated Reservation', 'reservations', sel.dataset.id);
-        showToast('Reservation updated.', 'success');
+    tbody.querySelectorAll('.accept-btn').forEach((button) => {
+      button.addEventListener('click', async () => {
+        button.disabled = true;
+        const { error: acceptError } = await supabase.rpc('accept_reservation', {
+          p_reservation_id: button.dataset.id,
+          p_due_date: button.dataset.dueDate || null,
+        });
+        if (acceptError) {
+          showToast(acceptError.message || 'Unable to accept reservation.', 'error');
+          button.disabled = false;
+          return;
+        }
+        await logActivity(profile.id, 'Accepted Reservation', 'reservations', button.dataset.id);
+        showToast('Reservation accepted and added to member borrowings.', 'success');
+        load();
       });
     });
 

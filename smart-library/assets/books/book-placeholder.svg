@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 338" role="img" aria-label="Book cover unavailable">
+  <rect width="600" height="338" fill="#e8edf5"/>
+  <rect x="245" y="78" width="110" height="150" rx="6" fill="#8b9bb5"/>
+  <path d="M300 78v150" stroke="#e8edf5" stroke-width="5"/>
+  <text x="300" y="270" text-anchor="middle" fill="#52627a" font-family="Arial, sans-serif" font-size="24">Book cover unavailable</text>
+</svg>

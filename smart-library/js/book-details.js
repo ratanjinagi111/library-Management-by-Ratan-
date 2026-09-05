@@ -5,6 +5,7 @@
 
 import { initAppShell, escapeHtml } from './layout.js';
 import { supabase, showToast, logActivity } from './supabase-config.js';
+import { getBookImage } from './book-images.js';
 
 const { profile, isStaff, contentEl } = await initAppShell({
   activeKey: 'books',
@@ -55,7 +56,9 @@ const reserveParams = new URLSearchParams({
 
 contentEl.innerHTML = `
   <div class="detail-header">
-    <div class="detail-cover"><i class="ti ti-book-2"></i></div>
+    <div class="detail-cover">
+      <img class="detail-cover__image" src="${getBookImage(book.title)}" alt="${escapeHtml(book.title)} book cover" onerror="this.onerror=null;this.src='assets/books/book-placeholder.svg';">
+    </div>
     <div class="detail-info">
       <h2>${escapeHtml(book.title)}</h2>
       <div class="detail-info__meta">
@@ -76,7 +79,7 @@ contentEl.innerHTML = `
       </div>
 
       <div class="detail-actions">
-        ${!isStaff ? `<a class="btn-gradient" href="reserve.html?${reserveParams.toString()}" title="Reserve this book" style="text-decoration:none;">
+        ${!isStaff ? `<a class="btn-gradient" href="reserve?${reserveParams.toString()}" title="Reserve this book" style="text-decoration:none;">
           <i class="ti ti-bookmark"></i> Reserve this book
         </a>` : ''}
         ${isStaff && available > 0 ? `<a href="issue.html?bookId=${book.id}" class="btn-gradient" style="text-decoration:none;"><i class="ti ti-arrow-up-right"></i> Issue a copy</a>` : ''}

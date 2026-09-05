@@ -41,6 +41,9 @@ alter table members enable row level security;
 create policy "members_select_own_or_staff" on members
   for select using (user_id = auth.uid() or is_staff());
 
+create policy "members_insert_own" on members
+  for insert with check (user_id = auth.uid());
+
 create policy "members_update_own_limited" on members
   for update using (user_id = auth.uid());
 

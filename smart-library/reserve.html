@@ -47,11 +47,14 @@
     <section class="card success" id="success">
       <h2>Reservation confirmed!</h2>
       <p id="success-text"></p>
-      <a href="my-borrowings.html">View my borrowings</a>
+      <a href="reservations.html">View my reservations</a>
     </section>
   </main>
-  <script>
+  <script type="module">
+    import { supabase } from './js/supabase-config.js';
+
     const params = new URLSearchParams(location.search);
+    const bookId = params.get('id');
     const title = params.get('title') || 'Selected book';
     const author = params.get('author') || 'Library collection';
     const price = Number(params.get('price') || 19);
@@ -78,19 +81,65 @@
     }
     issueInput.addEventListener('change', () => { returnInput.min = issueInput.value; updateSummary(); });
     returnInput.addEventListener('change', updateSummary);
-    document.getElementById('confirm').addEventListener('click', () => {
+    async function confirmReservation() {
       const days = Math.round((new Date(returnInput.value) - new Date(issueInput.value)) / 86400000);
       if (!issueInput.value || !returnInput.value || days < 1) {
-        errorEl.textContent = 'Submission date must be at least 1 day after the issue date.';
-        errorEl.style.display = 'block';
-        return;
+        throw new Error('Submission date must be at least 1 day after the issue date.');
       }
-      const borrowings = JSON.parse(localStorage.getItem('sl-local-borrowings') || '[]');
-      borrowings.push({ id: params.get('id') || `local-${Date.now()}`, memberId: params.get('memberId'), title, author, issueDate: issueInput.value, dueDate: returnInput.value, status: 'issued' });
-      localStorage.setItem('sl-local-borrowings', JSON.stringify(borrowings));
+      if (!bookId) throw new Error('No book was selected. Return to the book details page and try again.');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Please log in before reserving a book.');
+
+      const { data: members, error: memberError } = await supabase
+        .from('members')
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1);
+      if (memberError) throw memberError;
+
+      let member = members?.[0];
+      if (!member) {
+        const { data: createdMember, error: createMemberError } = await supabase
+          .from('members')
+          .insert({
+            user_id: user.id,
+            registration_number: `AUTO-${user.id.slice(0, 12)}`,
+          })
+          .select('id')
+          .single();
+        if (createMemberError) {
+          throw new Error(`Member account could not be created: ${createMemberError.message}`);
+        }
+        member = createdMember;
+      }
+
+      const { data: result, error: reservationError } = await supabase.rpc('reserve_book', {
+        p_book_id: bookId,
+        p_member_id: member.id,
+        p_expiry_date: returnInput.value,
+      });
+      if (reservationError) {
+        if (reservationError.code === '42883' || reservationError.message?.includes('reserve_book')) {
+          throw new Error('Reservation setup is incomplete. Run database/reserve_book_function.sql in Supabase SQL Editor.');
+        }
+        throw reservationError;
+      }
+
       document.getElementById('reservation-form').style.display = 'none';
       document.getElementById('success').style.display = 'block';
-      document.getElementById('success-text').innerHTML = `<b>${title}</b> reserved successfully.<br>Return date: ${returnInput.value}<br>Total amount: <b>₹${days * price}</b>`;
+      document.getElementById('success-text').innerHTML = `<b>${title}</b> reserved successfully.<br>Available copies: <b>${result.available_count}</b><br>Issued copies: <b>${result.issued_count}</b><br><small>Opening your reservations...</small>`;
+      setTimeout(() => { window.location.href = 'reservations.html'; }, 1200);
+    }
+    document.getElementById('confirm').addEventListener('click', async () => {
+      const button = document.getElementById('confirm');
+      button.disabled = true;
+      try {
+        await confirmReservation();
+      } catch (error) {
+        errorEl.textContent = error.message || 'Unable to reserve this book.';
+        errorEl.style.display = 'block';
+        button.disabled = false;
+      }
     });
   </script>
 </body>

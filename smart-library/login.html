@@ -10,6 +10,327 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/responsive.css">
+<style>
+  /* ================= Swinging monkey ================= */
+  .monkey-rig {
+    position: fixed;
+    top: 0;
+    left: 28px;
+    width: 74px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform-origin: top center;
+    animation: monkey-swing 2.6s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 40;
+  }
+
+  @keyframes monkey-swing {
+    0%   { transform: rotate(-24deg); }
+    10%  { transform: rotate(-27deg); }
+    50%  { transform: rotate(24deg); }
+    60%  { transform: rotate(27deg); }
+    100% { transform: rotate(-24deg); }
+  }
+
+  .monkey-rope {
+    width: 5px;
+    height: 108px;
+    flex-shrink: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      #d8ab55 0px,
+      #d8ab55 6px,
+      #b98a3a 6px,
+      #b98a3a 12px
+    );
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  }
+
+  .monkey {
+    position: relative;
+    width: 42px;
+    height: 62px;
+    margin-top: -2px;
+  }
+
+  /* Arms reach up from the shoulders to the base of the rope */
+  .monkey-arm {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    width: 11px;
+    height: 34px;
+    background: #8b5e34;
+    border-radius: 6px;
+    transform-origin: top center;
+  }
+
+  .monkey-arm--left {
+    transform: translateX(-9px) rotate(-34deg);
+  }
+
+  .monkey-arm--right {
+    transform: translateX(-2px) rotate(34deg);
+  }
+
+  .monkey-hand {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    width: 13px;
+    height: 13px;
+    margin-left: -6.5px;
+    background: #6e4526;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08) inset;
+  }
+
+  .monkey-hand--left { transform: translateX(-6px); }
+  .monkey-hand--right { transform: translateX(6px); }
+
+  .monkey-head {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 46px;
+    height: 40px;
+    margin-left: -23px;
+    background: #8b5e34;
+    border-radius: 50% 50% 46% 46%;
+    z-index: 3;
+  }
+
+  .monkey-ear {
+    position: absolute;
+    top: -3px;
+    width: 16px;
+    height: 16px;
+    background: #8b5e34;
+    border-radius: 50%;
+  }
+
+  .monkey-ear::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    background: #d9a066;
+    border-radius: 50%;
+  }
+
+  .monkey-ear--left { left: -7px; }
+  .monkey-ear--right { right: -7px; }
+
+  .monkey-face {
+    position: absolute;
+    top: 9px;
+    left: 50%;
+    width: 34px;
+    height: 28px;
+    margin-left: -17px;
+    background: #f4d9ae;
+    border-radius: 50% 50% 55% 55%;
+  }
+
+  .monkey-eye {
+    position: absolute;
+    top: 6px;
+    width: 4px;
+    height: 5px;
+    background: #2b1b12;
+    border-radius: 50%;
+  }
+
+  .monkey-eye--left { left: 8px; }
+  .monkey-eye--right { right: 8px; }
+
+  .monkey-snout {
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    width: 18px;
+    height: 12px;
+    margin-left: -9px;
+    background: #eccb98;
+    border-radius: 50%;
+  }
+
+  .monkey-nostril {
+    position: absolute;
+    top: 3px;
+    width: 2px;
+    height: 3px;
+    background: #6e4526;
+    border-radius: 50%;
+  }
+
+  .monkey-nostril--left { left: 5px; }
+  .monkey-nostril--right { right: 5px; }
+
+  .monkey-mouth {
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 9px;
+    height: 4px;
+    margin-left: -4.5px;
+    border-bottom: 2px solid #6b3a2e;
+    border-radius: 0 0 8px 8px;
+  }
+
+  .monkey-body {
+    position: absolute;
+    top: 32px;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin-left: -20px;
+    background: #8b5e34;
+    border-radius: 46% 46% 50% 50%;
+    z-index: 2;
+  }
+
+  .monkey-belly {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    width: 22px;
+    height: 26px;
+    margin-left: -11px;
+    background: #f4d9ae;
+    border-radius: 50%;
+  }
+
+  .monkey-leg {
+    position: absolute;
+    top: 62px;
+    width: 12px;
+    height: 26px;
+    background: #8b5e34;
+    border-radius: 6px;
+    transform-origin: top center;
+    z-index: 1;
+    animation: leg-swing 1.3s ease-in-out infinite;
+  }
+
+  .monkey-leg::after {
+    content: "";
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    width: 14px;
+    height: 8px;
+    margin-left: -7px;
+    background: #6e4526;
+    border-radius: 50%;
+  }
+
+  .monkey-leg--left {
+    left: 12px;
+    animation-delay: 0s;
+  }
+
+  .monkey-leg--right {
+    right: 12px;
+    animation-name: leg-swing-alt;
+    animation-duration: 1.3s;
+  }
+
+  @keyframes leg-swing {
+    0%, 100% { transform: rotate(-10deg); }
+    50% { transform: rotate(6deg); }
+  }
+
+  @keyframes leg-swing-alt {
+    0%, 100% { transform: rotate(10deg); }
+    50% { transform: rotate(-6deg); }
+  }
+
+  .monkey-tail {
+    position: absolute;
+    top: 40px;
+    right: -6px;
+    width: 26px;
+    height: 26px;
+    border: 6px solid #8b5e34;
+    border-left-color: transparent;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    transform-origin: left center;
+    animation: tail-wiggle 1.6s ease-in-out infinite;
+  }
+
+  @keyframes tail-wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(10deg); }
+  }
+
+  /* Scale everything down a touch on narrow screens, and keep clear of content */
+  @media (max-width: 640px) {
+    .monkey-rig {
+      left: 12px;
+      transform-origin: top center;
+    }
+    .monkey-rig,
+    .monkey-rig * {
+      transform: scale(0.8);
+    }
+    .monkey-rig {
+      animation: monkey-swing-mobile 2.6s ease-in-out infinite;
+    }
+    @keyframes monkey-swing-mobile {
+      0%   { transform: scale(0.8) rotate(-24deg); }
+      10%  { transform: scale(0.8) rotate(-27deg); }
+      50%  { transform: scale(0.8) rotate(24deg); }
+      60%  { transform: scale(0.8) rotate(27deg); }
+      100% { transform: scale(0.8) rotate(-24deg); }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .monkey-rig,
+    .monkey-leg,
+    .monkey-leg--right,
+    .monkey-tail {
+      animation: none !important;
+      transform: rotate(-10deg) !important;
+    }
+  }
+  /* ============== end swinging monkey ============== */
+
+  .monkey-rig {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    width: min(92vw, 760px);
+    height: auto;
+    transform: translateX(-50%);
+    animation: none;
+    z-index: 40;
+  }
+
+  .monkey-rig img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: contain;
+    object-position: top center;
+  }
+
+  @media (max-width: 860px) {
+    .monkey-rig {
+      width: min(96vw, 620px);
+    }
+
+    .monkey-rig img {
+      max-height: 220px;
+    }
+  }
+</style>
 </head>
 <body>
 
@@ -23,20 +344,20 @@
         <span class="auth-hero__brandtext">Smart Library</span>
       </a>
 
-      <h1 class="auth-hero__title">Welcome back.</h1>
-      <p class="auth-hero__subtitle">Log in to check due dates, reserve a title, or pick up where you left off in the catalog.</p>
+      <h1 class="auth-hero__title">Hey User 🙋‍♂️, Welcome Back 😊</h1>
+      <p class="auth-hero__subtitle">Log in to check due dates, reserve a title, or pick up where you left off in the catalog👻.</p>
 
       <dl class="auth-hero__stats">
         <div>
-          <dt>1,250+</dt>
+          <dt>30+</dt>
           <dd>Titles in the catalog</dd>
         </div>
         <div>
-          <dt>420+</dt>
+          <dt>4+</dt>
           <dd>Members already registered</dd>
         </div>
         <div>
-          <dt>14</dt>
+          <dt>5</dt>
           <dd>Day standard loan period</dd>
         </div>
       </dl>

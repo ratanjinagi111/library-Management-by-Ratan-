@@ -55,7 +55,7 @@ async function renderStaffDashboard() {
       </div>
     </div>
 
-    <div class="bottom" style="grid-template-columns:1.6fr 1fr;">
+    <div class="bottom" style="grid-template-columns:1.4fr 1fr 1fr;">
       <div class="panel panel-pad">
         <div class="panel-head-row"><h3>Recent activity</h3></div>
         <ul class="activity-list" id="activity-list"><li class="empty-state">Loading…</li></ul>
@@ -63,6 +63,10 @@ async function renderStaffDashboard() {
       <div class="panel panel-pad">
         <div class="panel-head-row"><h3>Top members <small style="font-weight:400;color:var(--text-muted);">by books issued</small></h3></div>
         <ul class="members-list" id="members-list"><li class="empty-state">Loading…</li></ul>
+      </div>
+      <div class="panel panel-pad">
+        <div class="panel-head-row"><h3>Notifications</h3></div>
+        <ul class="notice-list" id="notice-list"><li class="empty-state">Loading…</li></ul>
       </div>
     </div>
   `;
@@ -74,6 +78,7 @@ async function renderStaffDashboard() {
   loadPendingFines();
   loadActivityList(null);
   loadTopMembers();
+  loadNotifications();
 }
 
 function kpiSkeleton(n) {
@@ -515,7 +520,7 @@ async function loadReservationBox(memberId) {
     .from('reservations')
     .select('id, book_id, reservation_date, status, books(title, authors(author_name))')
     .eq('member_id', memberId)
-    .eq('status', 'pending')
+    .in('status', ['pending', 'accepted'])
     .order('reservation_date', { ascending: false })
     .limit(1);
 
@@ -545,7 +550,7 @@ async function loadReservationBox(memberId) {
       </div>
       <div class="reserved-meta">
         <div>Reserved on<b>${res.reservation_date}</b></div>
-        <div>Status<b class="status" style="color:var(--royal-blue); background:rgba(42,82,190,0.10); padding:4px 8px; border-radius:6px; width:max-content;">Pending</b></div>
+        <div>Status<b class="status" style="color:${res.status === 'accepted' ? 'var(--emerald)' : 'var(--royal-blue)'}; background:${res.status === 'accepted' ? 'rgba(16,185,129,0.12)' : 'rgba(42,82,190,0.10)'}; padding:4px 8px; border-radius:6px; width:max-content;">${res.status === 'accepted' ? 'Accepted' : 'Pending'}</b></div>
       </div>
       <div class="queue-note">
         <b>You are #${queuePosition || 1} in the queue</b>
